@@ -1,25 +1,20 @@
 from threading import Thread
-
+from pyeventbus3.pyeventbus3 import *
 from time import sleep
 
-from Middleware import Com
+from Com import Com
+from Message import Message
 
 class Process(Thread):
     
-    def __init__(self,name):
+    def __init__(self,name, id_in):
         Thread.__init__(self)
-
-        self.com = Com.Com()
-
+        self.com = Com(id_in)
         self.nbProcess = self.com.getNbProcess()
-
         self.myId = self.com.getMyId()
         self.setName(name)
-
-
         self.alive = True
         self.start()
-    
 
     def run(self):
         loop = 0
@@ -39,8 +34,9 @@ class Process(Thread):
                     
                 self.com.requestSC()
                 if self.com.mailbox.isEmpty():
-                    print("Catched !")
-                    self.com.broadcast("J'ai gagné !!!")
+                    #print("Catched !")
+                    message_send = Message("J'ai gagné !!!")
+                    self.com.broadcast(message_send)
                 else:
                     msg = self.com.mailbox.getMsg()
                     print(str(msg.getSender())+" à eu le jeton en premier")
@@ -50,15 +46,15 @@ class Process(Thread):
             if self.getName() == "P1":
 
                 if not self.com.mailbox.isEmpty():
-                    self.com.mailbox.getMsg()
+                    #msg = self.com.mailbox.getMsg()
                     self.com.recevFromSync(0)
 
                     self.com.synchronize()
                     
                     self.com.requestSC()
                     if self.com.mailbox.isEmpty():
-                        print("Catched !")
-                        self.com.broadcast("J'ai gagné !!!")
+                        message_send = Message("J'ai gagné !!!")
+                        self.com.broadcast(message_send)
                     else:
                         msg = self.com.mailbox.getMsg()
                         print(str(msg.getSender())+" à eu le jeton en premier")
@@ -72,20 +68,19 @@ class Process(Thread):
                     
                 self.com.requestSC()
                 if self.com.mailbox.isEmpty():
-                    print("Catched !")
-                    self.com.broadcast("J'ai gagné !!!")
+                    message_send = Message("J'ai gagné !!!")
+                    self.com.broadcast(message_send)
                 else:
                     msg = self.com.mailbox.getMsg()
                     print(str(msg.getSender())+" à eu le jeton en premier")
                 self.com.releaseSC()
-                
 
             loop+=1
         print(self.getName() + " stopped")
 
     def stop(self):
         self.alive = False
-        self.join()
+        #self.join()
 
     def waitStopped(self):
         self.join()
