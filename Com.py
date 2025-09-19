@@ -61,21 +61,47 @@ class Com:
             msg.setSender(event.getSender())
             self.put_in_mailbox(msg)
 
+    def broadcastSync(self, message_obj, from_id):
+        if self.myid == from_id:
+            # envoie message
+            self.estampille += 1
+            horloge = self.estampille
+            print(f"[broadcastSync] <{self.myid}> envoie à tous : #{message_obj}#")
 
+            # envoyer à chaque destinataire
+            for process in range(self.getNbProcess()):
+                if process == self.myid:
+                    continue
+                m = Message(message_obj)
+                sync_msg = MessageSync(m, self.myid, process)
+                sync_msg.changeToSend()
+                sync_msg.setHorloge(horloge)
+                PyBus.Instance().post(sync_msg)
 
+            # attendre les confirmations de tous
+            confirmations_recues = set()
+            while len(confirmations_recues) < self.getNbProcess() - 1:
+                time.sleep(0.5)
+                # récupérer toutes les confirmations
+                conf = self.mailbox_intern.getMessageConfirmationFromAny()
+                if conf and conf.getSource() not in confirmations_recues:
+                    confirmations_recues.add(conf.getSource())
+                    print(f"- [broadcastSync] <{self.myid}> confirmation de {conf.getSource()}")
+            print(f"[broadcastSync] <{self.myid}> Tous les processus ont accusé réception.")
 
+        else:
+            # on reçoit le message
+            msg_sync = None
+            while msg_sync is None:
+                time.sleep(0.5)
+                msg_sync = self.mailbox_intern.getMessageFromSync(from_id)
+            # placer le vrai Message dans la mailbox principale
+            self.mailbox.addMessage(msg_sync.getObject())
+            print(f"[broadcastSync] <{self.myid}> a reçu le broadcast de {from_id}")
 
-
-
-
-
-
-
-
-
-
-
-
+            # envoyer la confirmation au processus source
+            self.sendConfirmation(msg_sync.getObject(), from_id)
+            print(f"[broadcastSync] <{self.myid}> a envoyé la confirmation à {from_id}")
 
 
     def sendToSync(self, message, destinataires):
@@ -121,19 +147,9 @@ class Com:
         print(f"- [recevFromSyncConfirmation] <{self.myid}> reçoit confirmation de {str(source)}")
 
 
-
-
-
-
-
-
-
-
-
-
-
     def synchronize(self):
         print("Synchronisation des Processus...")
+        self.broadcastSync("SYNC", self.myid)
 
     def requestSC(self):
         self.state = SCState.REQUEST

@@ -42,3 +42,9 @@ class MailBoxSync:
             #print(f"Message courant : {message_sync.getSource()}, est message d'envoie ? : {message_sync.isSend()}")
             if message_sync.isSend() and message_sync.getSource() == source:
                 return self.box.pop(i)
+
+    def getMessageConfirmationFromAny(self):
+        for i in range(len(self.box)):
+            message_sync = self.box[i]
+            if message_sync.isConfirm() :
+                return self.box.pop(i)
