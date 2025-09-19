@@ -1,9 +1,7 @@
-from threading import Thread
 from pyeventbus3.pyeventbus3 import *
 from time import sleep
 
-from Com import Com
-from Message import Message
+from Comunicator import Com
 
 class Process(Thread):
     
@@ -48,8 +46,7 @@ class Process(Thread):
                 self.com.synchronize()
                 self.com.requestSC()
                 if self.com.mailbox.isEmpty():
-                    message_send = Message("J'ai gagné !!!")
-                    self.com.broadcast(message_send)
+                    self.com.broadcast("J'ai gagné !!!")
                 else:
                     msg = self.com.mailbox.getMsg()
                     print(str(msg.getSender())+" à eu le jeton en premier")
@@ -63,8 +60,7 @@ class Process(Thread):
                     
                 self.com.requestSC()
                 if self.com.mailbox.isEmpty():
-                    message_send = Message("J'ai gagné !!!")
-                    self.com.broadcast(message_send)
+                    self.com.broadcast("J'ai gagné !!!")
                 else:
                     msg = self.com.mailbox.getMsg()
                     print(str(str(msg.getSender()))+" à eu le jeton en premier")

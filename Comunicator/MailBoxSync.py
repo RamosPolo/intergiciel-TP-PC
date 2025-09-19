@@ -1,13 +1,22 @@
-from Message import Message
+from .Message import Message
 
 class MailBoxSync:
     def __init__(self):
         self.box = list()
 
-    def isEmpty(self):
+    def isEmpty(self)->bool:
+        """
+        Vérifie si la box est vide
+        :return:
+        """
         return not self.box
 
-    def addMessage(self, msg):
+    def addMessage(self, msg: Message):
+        """
+        Ajoute un message à la box
+        :param msg: Message
+        :return:
+        """
         self.box.append(msg)
 
     def getMsg(self) -> Message:
@@ -24,7 +33,7 @@ class MailBoxSync:
         """
         return self.box[0]
 
-    def getMessageConfirmationFrom(self, from_p=int):
+    def getMessageConfirmationFrom(self, from_p: int)->Message | None:
         """
         Retourne le message qui est lui est destiné, et le supprime de la box
         :param from_p: le destinataire du message
@@ -36,14 +45,23 @@ class MailBoxSync:
             if message_sync.isReceive() and message_sync.getSource() == from_p:
                 return self.box.pop(i)
 
-    def getMessageFromSync(self, source):
+    def getMessageFromSync(self, source: int)->Message | None:
+        """
+        Retourne le message de la source qui a été envoyé
+        :param source:
+        :return:
+        """
         for i in range(len(self.box)):
             message_sync = self.box[i]
             #print(f"Message courant : {message_sync.getSource()}, est message d'envoie ? : {message_sync.isSend()}")
             if message_sync.isSend() and message_sync.getSource() == source:
                 return self.box.pop(i)
 
-    def getMessageConfirmationFromAny(self):
+    def getMessageConfirmationFromAny(self)->Message | None:
+        """
+        Retourne la confirmation de message de tous les processus
+        :return:
+        """
         for i in range(len(self.box)):
             message_sync = self.box[i]
             if message_sync.isConfirm() :
