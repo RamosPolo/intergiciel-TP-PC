@@ -23,16 +23,3 @@ class MailBox:
         :return:
         """
         return self.box[0]
-
-    def getMessageFrom(self, from_p=int):
-        """
-        Retourne le message qui est lui est destiné, et le supprime de la box
-        :param from_p: le destinataire du message
-        :return:
-        """
-        for i in range(len(self.box)):
-            message = self.box[i]
-            print(f"{from_p} cherche le message: {message.getMsg()}, avec dest : {message.getDestinataire()} ")
-            #print(f"les dest du message : {message.getDestinataire()}")
-            if message.getDestinataire() == from_p:
-                return self.box.pop(i)
