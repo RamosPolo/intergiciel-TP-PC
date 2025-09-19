@@ -1,12 +1,13 @@
-class BroadcastMessage:
-    def __init__(self, object_message, source):
-        self.object = object_message
+class MessageDedies:
+    def __init__(self, message, source, to):
+        self.message = message
         self.horloge = 0
         self.source = source
+        self.to = to
 
     # retourne le message
     def getObject(self):
-        return self.object
+        return self.message
 
     # Retourne la valeur de l'horloge
     def getHorloge(self):
@@ -17,6 +18,9 @@ class BroadcastMessage:
 
     def getSource(self):
         return self.source
+
+    def getDestinataire(self):
+        return self.to
 
     def getSender(self):
         return self.getSource()
